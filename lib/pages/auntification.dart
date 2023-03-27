@@ -59,7 +59,7 @@ class _AuthPageState extends State<AuthPage> {
               ),
               style: TextStyle(color: Colors.white),
             ),
-            SizedBox(height: 20.0),
+            SizedBox(height: 2.0),
             ElevatedButton(
               onPressed: () {},
               child: Text('Submit'),
