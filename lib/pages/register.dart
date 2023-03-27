@@ -1,125 +1,75 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_final/pages/auntification.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_final/pages/mainPage.dart';
+import 'package:flutter_final/pages/register.dart';
+import 'package:flutter_final/styles/buttonstyle.dart';
+import 'package:flutter_final/styles/textstyle.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
-
-  // This widget is the root of your application.
+class RegisterPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Home Page'),
-    );
-  }
+  _RegisterPageState createState() => _RegisterPageState();
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-  final String title;
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
+class _RegisterPageState extends State<RegisterPage> {
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
+  TextEditingController _nameController = TextEditingController();
 
-class _MyHomePageState extends State<MyHomePage> {
-  final TextStyle logoText = const TextStyle(
-      color: Colors.black,
-      fontSize: 24.0,
-      fontStyle: FontStyle.normal,
-      fontWeight: FontWeight.w600);
-  final TextStyle simpleText = const TextStyle(
-      color: Colors.grey, fontSize: 14.0, fontWeight: FontWeight.w400);
-  final TextStyle linkStyle = const TextStyle(
-      color: Colors.blue, fontSize: 14.0, fontWeight: FontWeight.w400);
   final String logoImage = 'assets/logo.png';
+
   final ButtonStyle styleButton = ButtonStyle(
-    minimumSize: MaterialStateProperty.all(const Size(double.infinity, 50)),
-  );
+      minimumSize: MaterialStateProperty.all(const Size(double.infinity, 50)));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              child: Column(
-                children: [
-                  Image.asset(logoImage),
-                  const SizedBox(height: 5),
-                  Text(
-                    'Войти в Routine Support',
-                    style: logoText,
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: Column(children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.grey, width: 5.0),
-                            borderRadius: BorderRadius.circular(8.0)),
-                        hintText: 'Enter email'),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: TextFormField(
-                    obscureText: true,
-                    enableSuggestions: false,
-                    autocorrect: false,
-                    decoration: InputDecoration(
-                        contentPadding:
-                            EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-                        border: OutlineInputBorder(
-                            borderSide:
-                                BorderSide(color: Colors.grey, width: 5.0),
-                            borderRadius: BorderRadius.circular(8.0)),
-                        hintText: 'Password'),
-                  ),
-                ),
-                RichText(
-                  text: TextSpan(children: [
-                    TextSpan(
-                        text: 'Еще не зарегистрированы? ', style: simpleText),
-                    TextSpan(
-                        text: 'Создать аккаунт.',
-                        style: linkStyle,
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () => () {}),
-                  ]),
-                ),
-              ]),
-            ),
-            Expanded(
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => AuthPage()));
-                  },
-                  style: styleButton,
-                  child: const Text('Войти'),
-                ),
-              ),
-            ),
-          ],
-        ),
+      resizeToAvoidBottomInset: false,
+      body: Container(
+        padding: EdgeInsets.all(20.0),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Image.asset(logoImage),
+          SizedBox(
+            height: 20.0,
+          ),
+          Text('Зарегистрироваться в Routine Support',
+              style: logoText, textAlign: TextAlign.center),
+          SizedBox(height: 15.0),
+          TextField(
+              controller: _emailController,
+              decoration:
+                  InputDecoration(hintText: 'Email', border: borderTextField)),
+          SizedBox(height: 10.0),
+          TextField(
+            controller: _nameController,
+            decoration:
+                InputDecoration(hintText: 'Name', border: borderTextField),
+          ),
+          SizedBox(height: 10.0),
+          TextField(
+            controller: _passwordController,
+            obscureText: true,
+            enableSuggestions: false,
+            autocorrect: false,
+            decoration:
+                InputDecoration(hintText: 'Password', border: borderTextField),
+          ),
+          SizedBox(height: 10.0),
+          Text.rich(TextSpan(children: [
+            TextSpan(text: 'Уже зарегистрированы? ', style: simpleText),
+            TextSpan(
+                text: 'Войти',
+                style: linkStyle,
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    Navigator.pop(context);
+                  })
+          ])),
+          SizedBox(height: 10.0),
+          ElevatedButton(
+              onPressed: () {},
+              child: Text('Зарегистрироваться', style: buttonText),
+              style: styleButton),
+        ]),
       ),
     );
   }

@@ -1,6 +1,8 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'dart:ui';
+import 'package:flutter_final/pages/register.dart';
+import 'package:flutter_final/styles/textstyle.dart';
+import 'package:flutter_final/styles/buttonstyle.dart';
+import 'package:flutter/gestures.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -10,20 +12,11 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
   final String logoImage = 'assets/logo.png';
-  final TextStyle logoText = const TextStyle(
-      color: Colors.black,
-      fontSize: 24.0,
-      fontStyle: FontStyle.normal,
-      fontWeight: FontWeight.w600);
-  final TextStyle simpleText = const TextStyle(
-      color: Colors.grey, fontSize: 14.0, fontWeight: FontWeight.w400);
-  final TextStyle linkStyle = const TextStyle(
-      color: Colors.blue, fontSize: 14.0, fontWeight: FontWeight.w400);
+
   final ButtonStyle styleButton = ButtonStyle(
       minimumSize: MaterialStateProperty.all(const Size(double.infinity, 50)));
-  final TextStyle buttonText = const TextStyle(
-      color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.w600);
 
   @override
   Widget build(BuildContext context) {
@@ -40,11 +33,8 @@ class _MainPageState extends State<MainPage> {
           SizedBox(height: 15.0),
           TextField(
             controller: _emailController,
-            decoration: InputDecoration(
-                hintText: 'Email',
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(color: Colors.grey, width: 5.0))),
+            decoration:
+                InputDecoration(hintText: 'Email', border: borderTextField),
           ),
           SizedBox(height: 10.0),
           TextField(
@@ -53,19 +43,23 @@ class _MainPageState extends State<MainPage> {
             enableSuggestions: false,
             autocorrect: false,
             decoration: InputDecoration(
-                hintText: 'Password',
-                border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(color: Colors.grey, width: 5.0))),
+              hintText: 'Password',
+              border: borderTextField,
+            ),
           ),
           SizedBox(height: 10.0),
-          RichText(
-              text: TextSpan(children: [
+          Text.rich(TextSpan(children: [
             TextSpan(text: 'Еще не зарегистрированы? ', style: simpleText),
             TextSpan(
                 text: 'Создать аккаунт',
                 style: linkStyle,
-                recognizer: TapGestureRecognizer()..onTap = () => () {})
+                recognizer: TapGestureRecognizer()
+                  ..onTap = () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RegisterPage()));
+                  })
           ])),
           SizedBox(height: 10.0),
           ElevatedButton(
