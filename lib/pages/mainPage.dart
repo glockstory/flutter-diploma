@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_final/pages/calendar.dart';
 import 'package:flutter_final/pages/register.dart';
 import 'package:flutter_final/styles/textstyle.dart';
 import 'package:flutter_final/styles/buttonstyle.dart';
@@ -63,7 +64,10 @@ class _MainPageState extends State<MainPage> {
           ])),
           SizedBox(height: 10.0),
           ElevatedButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CalendarPage()));
+              },
               child: Text('Войти', style: buttonText),
               style: styleButton),
         ]),
