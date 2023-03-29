@@ -7,6 +7,7 @@ const TextStyle logoText = TextStyle(
   fontWeight: FontWeight.w600,
 );
 
+
 const TextStyle simpleText =
     TextStyle(color: Colors.grey, fontSize: 14.0, fontWeight: FontWeight.w400);
 
@@ -15,3 +16,9 @@ const TextStyle linkStyle =
 
 const TextStyle buttonText =
     TextStyle(color: Colors.white, fontSize: 20.0, fontWeight: FontWeight.w600);
+
+const TextStyle subTitleStyle =
+    TextStyle(fontSize: 16, fontWeight: FontWeight.w400);
+
+const Color bluishClr = Color(0xFF2F80ED);
+const primaryClr = bluishClr;
