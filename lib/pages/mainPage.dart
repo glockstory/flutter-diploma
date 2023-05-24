@@ -9,6 +9,7 @@ import 'package:flutter_final/widgets/button.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_final/services/AuthService.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -45,10 +46,15 @@ class _MainPageState extends State<MainPage> {
         },
       );
       print(response.body);
-      print('fuck');
       print(response.statusCode);
       // If the request is successful, return the user object
       if (response.statusCode == 200) {
+        final body = json.decode(response.body);
+        final userId = body['user']['_id'];
+        print(userId);
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('userId', userId);
+
         print('OK');
         Navigator.push(
           context,
@@ -146,24 +152,6 @@ class _MainPageState extends State<MainPage> {
           MyButton(
             label: 'Войти',
             onTap: _submit,
-            // () {
-            // if (_formKey.currentState!.validate()) {
-            //   debugPrint('Success');
-            //   Navigator.push(context,
-            //       MaterialPageRoute(builder: (context) => CalendarPage()));
-            // }
-            // setState(() {
-            //   _validateEmail = _emailController.text.isEmpty ? true : false;
-            //   _validatePass =
-            //       _passwordController.text.isEmpty ? true : false;
-            //   if (_validateEmail == false && _validatePass == false) {
-            //     Navigator.push(
-            //         context,
-            //         MaterialPageRoute(
-            //             builder: (context) => CalendarPage()));
-            //   }
-            // });
-            // }
           )
         ]),
       ),
