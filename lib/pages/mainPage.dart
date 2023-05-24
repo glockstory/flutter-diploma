@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_final/models/user.dart';
 import 'package:flutter_final/pages/calendar.dart';
 import 'package:flutter_final/pages/register.dart';
 import 'package:flutter_final/styles/textstyle.dart';
 import 'package:flutter_final/styles/buttonstyle.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_final/widgets/button.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_final/services/AuthService.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -22,6 +26,41 @@ class _MainPageState extends State<MainPage> {
 
   final ButtonStyle styleButton = ButtonStyle(
       minimumSize: MaterialStateProperty.all(const Size(double.infinity, 50)));
+
+  Future<User> _submit() async {
+    if (_formKey.currentState!.validate()) {
+      final Uri uri = Uri.parse('http://10.0.2.2:3000/signin');
+
+      print(_emailController.text);
+      print(_passwordController.text);
+
+      final response = await http.post(
+        uri,
+        body: jsonEncode(<String, String>{
+          'email': _emailController.text,
+          'password': _passwordController.text,
+        }),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8'
+        },
+      );
+      print(response.body);
+      print('fuck');
+      print(response.statusCode);
+      // If the request is successful, return the user object
+      if (response.statusCode == 200) {
+        print('OK');
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => CalendarPage()),
+        );
+        return User.fromJson(json.decode(response.body));
+      } else {
+        throw Exception('Failed to login');
+      }
+    }
+    throw Exception('Failed to login');
+  }
 
   @override
   void dispose() {
@@ -59,20 +98,6 @@ class _MainPageState extends State<MainPage> {
                 decoration: InputDecoration(
                   hintText: 'Email',
                   border: borderTextField,
-                  // errorText:
-                  //     _validateEmail ? null : 'Поле дожно быть заполнено',
-                  // errorBorder: _validateEmail
-                  //     ? OutlineInputBorder(
-                  //         borderSide: BorderSide(color: Colors.red),
-                  //         borderRadius: BorderRadius.circular(8.0),
-                  //       )
-                  //     : null,
-                  // focusedErrorBorder: _validateEmail
-                  //     ? OutlineInputBorder(
-                  //         borderSide: BorderSide(color: Colors.red),
-                  //         borderRadius: BorderRadius.circular(8.0),
-                  //       )
-                  //     : null,
                 ),
               ),
               SizedBox(height: 10.0),
@@ -119,25 +144,27 @@ class _MainPageState extends State<MainPage> {
           //     child: Text('Войти', style: buttonText),
           //     style: styleButton),
           MyButton(
-              label: 'Войти',
-              onTap: () {
-                if (_formKey.currentState!.validate()) {
-                  debugPrint('Success');
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => CalendarPage()));
-                }
-                // setState(() {
-                //   _validateEmail = _emailController.text.isEmpty ? true : false;
-                //   _validatePass =
-                //       _passwordController.text.isEmpty ? true : false;
-                //   if (_validateEmail == false && _validatePass == false) {
-                //     Navigator.push(
-                //         context,
-                //         MaterialPageRoute(
-                //             builder: (context) => CalendarPage()));
-                //   }
-                // });
-              })
+            label: 'Войти',
+            onTap: _submit,
+            // () {
+            // if (_formKey.currentState!.validate()) {
+            //   debugPrint('Success');
+            //   Navigator.push(context,
+            //       MaterialPageRoute(builder: (context) => CalendarPage()));
+            // }
+            // setState(() {
+            //   _validateEmail = _emailController.text.isEmpty ? true : false;
+            //   _validatePass =
+            //       _passwordController.text.isEmpty ? true : false;
+            //   if (_validateEmail == false && _validatePass == false) {
+            //     Navigator.push(
+            //         context,
+            //         MaterialPageRoute(
+            //             builder: (context) => CalendarPage()));
+            //   }
+            // });
+            // }
+          )
         ]),
       ),
     );
