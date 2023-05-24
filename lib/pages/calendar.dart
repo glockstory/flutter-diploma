@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_final/models/activity.dart';
 import 'package:flutter_final/pages/addActivity.dart';
 import 'package:flutter_final/pages/students.dart';
 import 'package:flutter_final/pages/mainPage.dart';
@@ -9,9 +10,11 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter_final/widgets/button.dart';
 import 'package:flutter_final/widgets/gridViewWidget.dart';
 import 'package:flutter_final/widgets/inputField.dart';
-
+import 'package:http/http.dart' as http;
 import '../utils.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
+import 'dart:convert';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -19,26 +22,30 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
-  List<String> timeList = [
-    '6:00',
-    '7:00',
-    '8:00',
-    '9:00',
-    '10:00',
-    '11:00',
-    '12:00',
-    '13:00',
-    '14:00',
-    '15:00',
-    '16:00',
-    '17:00',
-    '18:00',
-    '19:00',
-    '20:00',
-    '21:00',
-    '22:00',
-    '23:00'
-  ];
+  
+  Future<List<dynamic>> getActivities() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    print(userId);
+    final Uri uri =
+        Uri.parse('http://10.0.2.2:3000/activities/6230ceefdf1df472a675c92b');
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      final activities = jsonDecode(response.body);
+      print(activities);
+      return activities;
+    } else {
+      throw Exception('Failed to load records');
+    }
+    //throw Exception('Failed to load records');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // вызов функции при запуске экрана
+    getActivities();
+  }
 
   @override
   Widget build(BuildContext context) {
