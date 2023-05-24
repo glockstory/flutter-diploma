@@ -6,6 +6,10 @@ import 'package:flutter_final/widgets/button.dart';
 import 'package:flutter_final/widgets/studentsPicker.dart';
 import 'package:flutter_final/widgets/twoButtons.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AddActivity extends StatefulWidget {
   const AddActivity({super.key});
@@ -28,6 +32,42 @@ class _AddActivityState extends State<AddActivity> {
   TextEditingController _timeEndController = TextEditingController();
   List<bool> _isSelected = [false, false];
   //List<String> names = ['Avraam', 'Nikita', 'George', 'Mark'];
+
+  Future<void> createActivity(
+      // String name,
+      // String date,
+      // String timeStart,
+      // String timeEnd,
+      // String url,
+      // String typeActivity,
+      // String students,
+      // int repeat
+      ) async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    final Uri uri = Uri.parse('http://10.0.2.2:3000/activities/create');
+    final response = await http.post(
+      uri,
+      body: jsonEncode(
+        <String, String>{
+          'name': _titleController.text,
+          'date': _dateController.text,
+          'start': _timeStartController.text,
+          'end': _timeEndController.text,
+          //'url':,
+          //'repeatType':,
+          //'coachId': userId,
+          //'students':
+        },
+      ),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+    );
+    if (response.statusCode != 201) {
+      throw Exception('Failed to create activity');
+    }
+  }
 
   String dropdownvalue = list.first;
   @override
@@ -191,7 +231,23 @@ class _AddActivityState extends State<AddActivity> {
             MyButton(
                 label: 'Создать',
                 onTap: () {
+                  createActivity();
                   //TODO: Create activity
+
+                  // Future<void> makeGetRequest() async {
+                  //   final response = await http
+                  //       .post(Uri.parse('http://localhost:5000/api/'));
+
+                  //   if (response.statusCode == 200) {
+                  //     final data = jsonDecode(response.body);
+                  //     print(data);
+                  //   } else {
+                  //     print(
+                  //         'Request failed with status: ${response.statusCode}.');
+                  //   }
+                  // }
+
+                  // makeGetRequest();
                 })
           ],
         ),
