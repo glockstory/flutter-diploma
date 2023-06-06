@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_final/models/imageUrl.dart';
+import 'package:flutter_final/pages/addActivity.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -17,8 +19,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     'https://www.sclera.be/resources/pictos/barbeque%20t.png'
   ];
 
-  String _selectedImageUrl = "";
-
+  String _selectedImageUrl = '';
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -67,6 +68,8 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                     onTap: () {
                       setState(() {
                         _selectedImageUrl = _imageUrls[index];
+                        print(_selectedImageUrl);
+                        AddActivity.imageUrl = _selectedImageUrl;
                       });
                       Navigator.pop(context);
                     },

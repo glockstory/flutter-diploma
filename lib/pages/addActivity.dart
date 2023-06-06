@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_final/models/imageUrl.dart';
 import 'package:flutter_final/widgets/imagePicker.dart';
 import 'package:flutter_final/styles/textstyle.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -8,10 +9,12 @@ import 'package:flutter_final/widgets/twoButtons.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddActivity extends StatefulWidget {
+  static String? imageUrl;
+
   const AddActivity({super.key});
 
   @override
@@ -25,12 +28,15 @@ const List<String> list = <String>[
   'Каждый месяц'
 ];
 
+int selectedRepeatType = 0;
+
 class _AddActivityState extends State<AddActivity> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
   TextEditingController _timeStartController = TextEditingController();
   TextEditingController _timeEndController = TextEditingController();
   List<bool> _isSelected = [false, false];
+
   //List<String> names = ['Avraam', 'Nikita', 'George', 'Mark'];
 
   Future<void> createActivity(
@@ -45,7 +51,11 @@ class _AddActivityState extends State<AddActivity> {
       ) async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
+    mongo.ObjectId coachId = mongo.ObjectId.parse(userId!);
+
     final Uri uri = Uri.parse('http://10.0.2.2:3000/activities/create');
+    print('coachId: ${userId}');
+    print(dropdownvalue);
     final response = await http.post(
       uri,
       body: jsonEncode(
@@ -54,9 +64,9 @@ class _AddActivityState extends State<AddActivity> {
           'date': _dateController.text,
           'start': _timeStartController.text,
           'end': _timeEndController.text,
-          //'url':,
-          //'repeatType':,
-          //'coachId': userId,
+          'pictogram': AddActivity.imageUrl ?? '',
+          'repeatType': selectedRepeatType.toString(),
+          'coachId': coachId.toString(),
           //'students':
         },
       ),
@@ -64,6 +74,7 @@ class _AddActivityState extends State<AddActivity> {
         'Content-Type': 'application/json; charset=UTF-8'
       },
     );
+    print(response.statusCode);
     if (response.statusCode != 201) {
       throw Exception('Failed to create activity');
     }
@@ -209,6 +220,7 @@ class _AddActivityState extends State<AddActivity> {
                         onChanged: (String? value) {
                           setState(() {
                             dropdownvalue = value!;
+                            selectedRepeatType = list.indexOf(dropdownvalue);
                           });
                         })
                     // ToggleButtons(
