@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_final/models/student.dart';
 import 'package:flutter_final/pages/addActivity.dart';
+import 'package:flutter_final/pages/addStudent.dart';
 import 'package:flutter_final/pages/calendar.dart';
 import 'package:flutter_final/pages/mainPage.dart';
 import 'package:flutter_final/pages/register.dart';
@@ -32,8 +33,7 @@ class _StudentsPageState extends State<StudentsPage> {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     print(userId);
-    final Uri uri =
-        Uri.parse('http://10.0.2.2:3000/students/6230ceefdf1df472a675c92b');
+    final Uri uri = Uri.parse('http://10.0.2.2:3000/students/$userId');
     final response = await http.get(uri);
     if (response.statusCode == 200) {
       final List<dynamic> studentJson = json.decode(response.body);
@@ -58,7 +58,6 @@ class _StudentsPageState extends State<StudentsPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Дети'),
-        //leading: Icon(Icons.menu),
       ),
       drawer: Drawer(
           child: SafeArea(
@@ -108,16 +107,13 @@ class _StudentsPageState extends State<StudentsPage> {
           }
           return CircularProgressIndicator();
         },
-        // itemCount: students.length,
-        // itemBuilder: (context, index) {
-        //   return Container(
-        //     child: StudentCardWidget(
-        //       student: students[index],
-        //     ),
-        //   );
-        // },
       ),
-      floatingActionButton: MyButton(label: '+ Студент', onTap: () {}),
+      floatingActionButton: MyButton(
+          label: '+ Студент',
+          onTap: () {
+            Navigator.push(
+                context, MaterialPageRoute(builder: (context) => AddStudent()));
+          }),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButtonAnimator: FloatingActionButtonAnimator.scaling,
     );
