@@ -3,14 +3,14 @@ import 'package:flutter_final/models/student.dart';
 import 'package:flutter_final/styles/textstyle.dart';
 
 class StudentCardWidget extends StatefulWidget {
-  const StudentCardWidget({super.key});
+  final Student student;
+  const StudentCardWidget({Key? key, required this.student}) : super(key: key);
 
   @override
   State<StudentCardWidget> createState() => _StudentCardWidgetState();
 }
 
 class _StudentCardWidgetState extends State<StudentCardWidget> {
-  //final Student student;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +30,7 @@ class _StudentCardWidgetState extends State<StudentCardWidget> {
                       child: Row(children: [
                         Icon(Icons.person_2_rounded),
                         Text(
-                          'student.name',
+                          widget.student.name,
                           style: logoText,
                         ),
                       ]),
