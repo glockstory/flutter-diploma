@@ -1,46 +1,11 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter/src/widgets/framework.dart';
-// import 'package:flutter/src/widgets/placeholder.dart';
-// import 'package:flutter_final/styles/textstyle.dart';
-
-// class StudentPickerWidget extends StatefulWidget {
-//   final List<String> names;
-//   StudentPickerWidget({Key? key, required this.names}) : super(key: key);
-
-//   @override
-//   State<StudentPickerWidget> createState() => _StudentPickerWidgetState();
-// }
-
-// class _StudentPickerWidgetState extends State<StudentPickerWidget> {
-//   List<String> _selectedNames = [];
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView.builder(
-//       itemCount: widget.names.length,
-//       itemBuilder: (context, index) {
-//         final name = widget.names[index];
-//         final isSelected = _selectedNames.contains(name);
-
-//         return ElevatedButton(
-//             onPressed: () {
-//               setState(() {
-//                 if (isSelected) {
-//                   _selectedNames.remove(name);
-//                 } else {
-//                   _selectedNames.add(name);
-//                 }
-//               });
-//             },
-//             style: ElevatedButton.styleFrom(
-//                 primary: isSelected ? primaryClr : Colors.grey),
-//             child: Text(name));
-//       },
-//     );
-//   }
-// }
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_final/models/student.dart';
+import 'package:flutter_final/pages/addActivity.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'package:flutter_final/styles/textstyle.dart';
 
 class StudentPickerWidget extends StatefulWidget {
   const StudentPickerWidget({super.key});
@@ -50,50 +15,88 @@ class StudentPickerWidget extends StatefulWidget {
 }
 
 class _StudentPickerWidgetState extends State<StudentPickerWidget> {
-  List<String> users = [
-    'Никита',
-    'Данила',
-    'Марина',
-    'Юлия',
-  ];
-  bool _isActiveButton = true;
+  List<Student> students = [];
+  List selectedStudents = [];
+  Color buttonColor = Colors.grey;
+  List<bool> _buttonStates = [];
+
+  Future<List<Student>> getStudents() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    final Uri uri = Uri.parse('http://10.0.2.2:3000/students/$userId');
+    final response = await http.get(uri);
+    if (response.statusCode == 200) {
+      final List<dynamic> studentJson = json.decode(response.body);
+      students = studentJson.map((json) => Student.fromJson(json)).toList();
+
+      setState(() {
+        _buttonStates = List.filled(students.length, false);
+      });
+      return students;
+    } else {
+      throw Exception('Failed to load records');
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getStudents().then((students) {
+      setState(() {
+        this.students = students;
+        _buttonStates = List.filled(students.length, false);
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Expanded(
-        child: Container(
-      decoration: BoxDecoration(
-          // border: Border.all(
-          //   color: Colors.grey,
-          //   width: 2.0,
-          // ),
-          // borderRadius: BorderRadius.circular(2.0),
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        decoration: BoxDecoration(),
+        child: SingleChildScrollView(
+          child: Wrap(
+            spacing: 5.0,
+            children: [
+              if (students.isNotEmpty)
+                Row(
+                  children: students.map((student) {
+                    int index = students.indexOf(student);
+                    return ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          if (_buttonStates[index] == false) {
+                            selectedStudents.add(student);
+                            _buttonStates[index] = true;
+                            AddActivity.selectedStudentsToSend =
+                                selectedStudents;
+                            print('after add: ${selectedStudents}');
+                          } else {
+                            selectedStudents.remove(student);
+                            _buttonStates[index] = false;
+                            print('after delete: ${selectedStudents}');
+                            AddActivity.selectedStudentsToSend =
+                                selectedStudents;
+                          }
+                        });
+                      },
+                      child: Text(student.name),
+                      style: ElevatedButton.styleFrom(
+                        primary:
+                            _buttonStates[index] ? primaryClr : Colors.grey,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+              if (students.isEmpty) CircularProgressIndicator(),
+            ],
           ),
-      child: Wrap(
-        spacing: 5.0,
-        runSpacing: 8.0,
-        children: users.map((user) {
-          return ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                primary: _isActiveButton ? Colors.blue : Colors.grey,
-                minimumSize: Size(100, 40)),
-            onPressed: () {
-              debugPrint('before: $_isActiveButton');
-              _toggleButton();
-              debugPrint('after: $_isActiveButton');
-
-              debugPrint(user);
-            },
-            child: Text(user),
-          );
-        }).toList(),
+        ),
       ),
-    ));
-  }
-
-  void _toggleButton() {
-    setState(() {
-      _isActiveButton = !_isActiveButton;
-    });
+    );
   }
 }
