@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AddActivity extends StatefulWidget {
   static String? imageUrl;
+  static List? selectedStudentsToSend;
 
   const AddActivity({super.key});
 
@@ -54,20 +55,28 @@ class _AddActivityState extends State<AddActivity> {
     mongo.ObjectId coachId = mongo.ObjectId.parse(userId!);
 
     final Uri uri = Uri.parse('http://10.0.2.2:3000/activities/create');
-    print('coachId: ${userId}');
-    print(dropdownvalue);
+
+    final List<String> studentsId = [];
+
+    if (AddActivity.selectedStudentsToSend != null) {
+      for (var element in AddActivity.selectedStudentsToSend!) {
+        final id = element.id;
+        studentsId.add(id);
+      }
+    }
+
     final response = await http.post(
       uri,
       body: jsonEncode(
-        <String, String>{
+        <String, dynamic>{
           'name': _titleController.text,
           'date': _dateController.text,
           'start': _timeStartController.text,
           'end': _timeEndController.text,
           'pictogram': AddActivity.imageUrl ?? '',
           'repeatType': selectedRepeatType.toString(),
-          'coachId': coachId.toString(),
-          //'students':
+          'coachId': coachId,
+          'students': studentsId,
         },
       ),
       headers: <String, String>{
@@ -76,6 +85,7 @@ class _AddActivityState extends State<AddActivity> {
     );
     print(response.statusCode);
     if (response.statusCode != 201) {
+      print(response.body);
       throw Exception('Failed to create activity');
     }
   }
