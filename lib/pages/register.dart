@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_final/models/user.dart';
 import 'package:flutter_final/pages/mainPage.dart';
 import 'package:flutter_final/pages/register.dart';
 import 'package:flutter_final/styles/buttonstyle.dart';
