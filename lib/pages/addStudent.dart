@@ -61,7 +61,7 @@ class _AddStudentState extends State<AddStudent> {
                 height: 8,
               ),
               const Text(
-                'Изображение',
+                'Имя',
                 style: simpleText,
               ),
               SizedBox(
@@ -70,7 +70,7 @@ class _AddStudentState extends State<AddStudent> {
               TextFormField(
                   controller: _nameController,
                   decoration: InputDecoration(
-                      hintText: 'Email', border: borderTextField)),
+                      hintText: 'Введите имя', border: borderTextField)),
             ],
           )),
       floatingActionButton: MyButton(
