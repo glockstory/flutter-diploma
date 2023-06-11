@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_final/models/imageUrl.dart';
+import 'package:flutter_final/pages/calendar.dart';
 import 'package:flutter_final/widgets/imagePicker.dart';
 import 'package:flutter_final/styles/textstyle.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -38,24 +39,40 @@ class _AddActivityState extends State<AddActivity> {
   TextEditingController _timeEndController = TextEditingController();
   List<bool> _isSelected = [false, false];
 
-  //List<String> names = ['Avraam', 'Nikita', 'George', 'Mark'];
+  Future<void> _showMyDialog() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Success'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Text('Activity is created'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Confirm'),
+              onPressed: () async {
+                //ВЫХОД ИЗ СТРАНИЦЫ НА КАЛЕНДАРЬ
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CalendarPage()));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
-  Future<void> createActivity(
-      // String name,
-      // String date,
-      // String timeStart,
-      // String timeEnd,
-      // String url,
-      // String typeActivity,
-      // String students,
-      // int repeat
-      ) async {
+  Future<void> createActivity() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     mongo.ObjectId coachId = mongo.ObjectId.parse(userId!);
-
     final Uri uri = Uri.parse('http://10.0.2.2:3000/activities/create');
-
     final List<String> studentsId = [];
 
     if (AddActivity.selectedStudentsToSend != null) {
@@ -84,11 +101,15 @@ class _AddActivityState extends State<AddActivity> {
       },
     );
     print(response.statusCode);
-    if (response.statusCode != 201) {
+    if (response.statusCode == 201) {
+      await _showMyDialog();
+    } else {
       print(response.body);
       throw Exception('Failed to create activity');
     }
   }
+
+  final _formKey = GlobalKey<FormState>();
 
   String dropdownvalue = list.first;
   @override
@@ -99,181 +120,160 @@ class _AddActivityState extends State<AddActivity> {
         title: Text('Создание активности'),
       ),
       body: Container(
-        padding: EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: _titleController,
-              style: logoText,
-              textAlign: TextAlign.center,
-              decoration: InputDecoration(
-                  hintText: 'Введите заголовок', border: InputBorder.none),
-              onChanged: (value) {
-                //TODO: save value
-              },
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          padding: EdgeInsets.all(20.0),
+          child: Form(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(
-                  child: TextField(
-                    keyboardType: TextInputType.none,
-                    showCursor: false,
-                    enableInteractiveSelection: false,
-                    controller: _dateController,
-                    decoration: InputDecoration(
-                        labelText: 'Дата',
-                        suffixIcon: Icon(Icons.calendar_today)),
-                    onTap: () {
-                      DatePicker.showDatePicker(
-                        context,
-                        showTitleActions: true,
-                        minTime: DateTime(2022, 1, 1),
-                        maxTime: DateTime(2023, 12, 31),
-                        onConfirm: (date) {
-                          setState(() {
-                            if (date != null) {
+                TextFormField(
+                  //key: _formKey,
+                  controller: _titleController,
+                  style: logoText,
+                  textAlign: TextAlign.center,
+                  decoration: InputDecoration(
+                      hintText: 'Введите заголовок', border: InputBorder.none),
+                  onChanged: (value) {
+                    //TODO: save value
+                  },
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: TextFormField(
+                        key: _formKey,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter value';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.none,
+                        showCursor: false,
+                        enableInteractiveSelection: false,
+                        controller: _dateController,
+                        decoration: InputDecoration(
+                            labelText: 'Дата',
+                            suffixIcon: Icon(Icons.calendar_today)),
+                        onTap: () {
+                          DatePicker.showDatePicker(
+                            context,
+                            showTitleActions: true,
+                            minTime: DateTime(2022, 1, 1),
+                            maxTime: DateTime(2023, 12, 31),
+                            onConfirm: (date) {
                               setState(() {
-                                _dateController.text =
-                                    DateFormat('dd.MM.yy').format(date);
+                                if (date != null) {
+                                  setState(() {
+                                    _dateController.text =
+                                        DateFormat('dd.MM.yy').format(date);
+                                  });
+                                }
                               });
-                            }
-                          });
+                            },
+                          );
                         },
-                      );
-                    },
-                  ),
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        keyboardType: TextInputType.none,
+                        controller: _timeStartController,
+                        showCursor: false,
+                        enableInteractiveSelection: false,
+                        decoration: InputDecoration(
+                            labelText: 'Начало',
+                            suffixIcon: Icon(Icons.access_time)),
+                        onTap: () {
+                          DatePicker.showTimePicker(
+                            context,
+                            showSecondsColumn: false,
+                            onConfirm: (time) {
+                              setState(() {
+                                _timeStartController.text =
+                                    DateFormat.Hm().format(time);
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: TextFormField(
+                        keyboardType: TextInputType.none,
+                        controller: _timeEndController,
+                        showCursor: false,
+                        enableInteractiveSelection: false,
+                        decoration: InputDecoration(
+                            labelText: 'Окончание',
+                            suffixIcon: Icon(Icons.access_time)),
+                        onTap: () {
+                          DatePicker.showTimePicker(
+                            context,
+                            showSecondsColumn: false,
+                            onConfirm: (time) {
+                              setState(() {
+                                _timeEndController.text =
+                                    DateFormat.Hm().format(time);
+                              });
+                            },
+                          );
+                        },
+                      ),
+                    )
+                  ],
                 ),
-                SizedBox(width: 10),
+                SizedBox(height: 10.0),
                 Expanded(
-                  child: TextField(
-                    keyboardType: TextInputType.none,
-                    controller: _timeStartController,
-                    showCursor: false,
-                    enableInteractiveSelection: false,
-                    decoration: InputDecoration(
-                        labelText: 'Начало',
-                        suffixIcon: Icon(Icons.access_time)),
-                    onTap: () {
-                      DatePicker.showTimePicker(
-                        context,
-                        showSecondsColumn: false,
-                        onConfirm: (time) {
-                          setState(() {
-                            _timeStartController.text =
-                                DateFormat.Hm().format(time);
-                          });
-                        },
-                      );
-                    },
-                  ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          'Изображение',
+                          style: simpleText,
+                        ),
+                        ImagePickerWidget(selectedImage: ''),
+                        const SizedBox(height: 8.0),
+                        const Text('Тип активности', style: simpleText),
+                        const SizedBox(height: 8.0),
+                        const TwoButtonWidget(),
+                        const SizedBox(height: 16.0),
+                        const Text('Студенты', style: simpleText),
+                        // TODO: FIX active
+                        const StudentPickerWidget(),
+                        const SizedBox(height: 16.0),
+                        const Text(
+                          'Повторять',
+                          style: simpleText,
+                        ),
+                        DropdownButton(
+                            items: list
+                                .map<DropdownMenuItem<String>>((String value) {
+                              return DropdownMenuItem<String>(
+                                value: value,
+                                child: Text(value),
+                              );
+                            }).toList(),
+                            value: dropdownvalue,
+                            onChanged: (String? value) {
+                              setState(() {
+                                dropdownvalue = value!;
+                                selectedRepeatType =
+                                    list.indexOf(dropdownvalue);
+                              });
+                            })
+                      ]),
                 ),
-                SizedBox(width: 10),
-                Expanded(
-                  child: TextField(
-                    keyboardType: TextInputType.none,
-                    controller: _timeEndController,
-                    showCursor: false,
-                    enableInteractiveSelection: false,
-                    decoration: InputDecoration(
-                        labelText: 'Окончание',
-                        suffixIcon: Icon(Icons.access_time)),
+                MyButton(
+                    label: 'Создать',
                     onTap: () {
-                      DatePicker.showTimePicker(
-                        context,
-                        showSecondsColumn: false,
-                        onConfirm: (time) {
-                          setState(() {
-                            _timeEndController.text =
-                                DateFormat.Hm().format(time);
-                          });
-                        },
-                      );
-                    },
-                  ),
-                )
+                      createActivity();
+                    })
               ],
             ),
-            SizedBox(height: 10.0),
-            Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Изображение',
-                      style: simpleText,
-                    ),
-                    ImagePickerWidget(),
-                    const SizedBox(height: 8.0),
-                    const Text('Тип активности', style: simpleText),
-                    const SizedBox(height: 8.0),
-                    const TwoButtonWidget(),
-                    const SizedBox(height: 16.0),
-                    const Text('Студенты', style: simpleText),
-                    // TODO: FIX active
-                    const StudentPickerWidget(),
-                    const SizedBox(height: 16.0),
-                    const Text(
-                      'Повторять',
-                      style: simpleText,
-                    ),
-                    DropdownButton(
-                        items:
-                            list.map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                        value: dropdownvalue,
-                        onChanged: (String? value) {
-                          setState(() {
-                            dropdownvalue = value!;
-                            selectedRepeatType = list.indexOf(dropdownvalue);
-                          });
-                        })
-                    // ToggleButtons(
-                    //     children: <Widget>[
-                    //       Text('Общая'),
-                    //       Text('Индивидуальная')
-                    //     ],
-                    //     isSelected: _isSelected,
-                    //     selectedColor: primaryClr,
-                    //     color: Colors.grey,
-                    //     onPressed: (int index) {
-                    //       setState(() {
-                    //         for (var i = 0; i < _isSelected.length; i++) {
-                    //           _isSelected[i] = i == index;
-                    //         }
-                    //       });
-                    //     }),
-                  ]),
-            ),
-            MyButton(
-                label: 'Создать',
-                onTap: () {
-                  createActivity();
-                  //TODO: Create activity
-
-                  // Future<void> makeGetRequest() async {
-                  //   final response = await http
-                  //       .post(Uri.parse('http://localhost:5000/api/'));
-
-                  //   if (response.statusCode == 200) {
-                  //     final data = jsonDecode(response.body);
-                  //     print(data);
-                  //   } else {
-                  //     print(
-                  //         'Request failed with status: ${response.statusCode}.');
-                  //   }
-                  // }
-
-                  // makeGetRequest();
-                })
-          ],
-        ),
-      ),
+          )),
     );
   }
 }
