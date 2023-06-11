@@ -5,6 +5,8 @@ import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 
 class ImagePickerWidget extends StatefulWidget {
+  String? selectedImage;
+  ImagePickerWidget({this.selectedImage});
   @override
   _ImagePickerWidgetState createState() => _ImagePickerWidgetState();
 }
@@ -18,6 +20,18 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
     'https://www.sclera.be/resources/pictos/ballenbad%20ballen%20gooien%20t.png',
     'https://www.sclera.be/resources/pictos/barbeque%20t.png'
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    print('url: ${widget.selectedImage}');
+    if (widget.selectedImage != '' && widget.selectedImage != null) {
+      setState(() {
+        print('done');
+        _selectedImageUrl = widget.selectedImage!;
+      });
+    }
+  }
 
   String _selectedImageUrl = '';
   @override
