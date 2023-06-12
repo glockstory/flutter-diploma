@@ -68,6 +68,38 @@ class _AddActivityState extends State<AddActivity> {
     );
   }
 
+  Future<void> createNotification(responseActivityId) async {
+    final activityId = json.decode(responseActivityId);
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    mongo.ObjectId coachId = mongo.ObjectId.parse(userId!);
+    final Uri uri = Uri.parse('http://10.0.2.2:3000/notifications/create');
+
+    final response = await http.post(
+      uri,
+      body: jsonEncode(
+        <String, dynamic>{
+          'activityId': activityId,
+          'date': _dateController.text,
+          'coachId': coachId,
+          'start': _timeStartController.text,
+          'end': _timeEndController.text,
+          'name': _titleController.text
+        },
+      ),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8'
+      },
+    );
+    print(response.statusCode);
+    if (response.statusCode == 201) {
+      print('ok');
+    } else {
+      print(response.body);
+      throw Exception('Failed to create activity');
+    }
+  }
+
   Future<void> createActivity() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
@@ -101,7 +133,9 @@ class _AddActivityState extends State<AddActivity> {
       },
     );
     print(response.statusCode);
+    print('FUUCK YOUUUUUUUUUUU ${response.body}');
     if (response.statusCode == 201) {
+      await createNotification(response.body);
       await _showMyDialog();
     } else {
       print(response.body);
