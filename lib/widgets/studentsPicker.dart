@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_final/models/student.dart';
 import 'package:flutter_final/pages/addActivity.dart';
+import 'package:flutter_final/pages/editActivity.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_final/styles/textstyle.dart';
@@ -71,12 +72,16 @@ class _StudentPickerWidgetState extends State<StudentPickerWidget> {
                             _buttonStates[index] = true;
                             AddActivity.selectedStudentsToSend =
                                 selectedStudents;
+                            EditActivity.selectedStudentsToSend =
+                                selectedStudents;
                             print('after add: ${selectedStudents}');
                           } else {
                             selectedStudents.remove(student);
                             _buttonStates[index] = false;
                             print('after delete: ${selectedStudents}');
                             AddActivity.selectedStudentsToSend =
+                                selectedStudents;
+                            EditActivity.selectedStudentsToSend =
                                 selectedStudents;
                           }
                         });
