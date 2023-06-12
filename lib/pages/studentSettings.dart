@@ -56,7 +56,7 @@ class _StudentSettingsState extends State<StudentSettings> {
               },
             ),
             TextButton(
-              child: Text('Cancel'),
+              child: Text('Cancel', style: TextStyle(color: Colors.red)),
               onPressed: () {
                 Navigator.of(context).pop();
               },

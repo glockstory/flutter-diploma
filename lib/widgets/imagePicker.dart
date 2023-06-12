@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_final/models/imageUrl.dart';
 import 'package:flutter_final/pages/addActivity.dart';
+import 'package:flutter_final/pages/editActivity.dart';
 import 'package:http/http.dart' as http;
 import 'package:cached_network_image/cached_network_image.dart';
 
@@ -25,12 +26,18 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
   void initState() {
     super.initState();
     print('url: ${widget.selectedImage}');
-    if (widget.selectedImage != '' && widget.selectedImage != null) {
+    if (widget.selectedImage != '') {
       setState(() {
         print('done');
         _selectedImageUrl = widget.selectedImage!;
       });
     }
+  }
+
+  @override
+  void dispose() {
+    //widget.selectedImage.dispose(); // don't forget to dispose
+    super.dispose();
   }
 
   String _selectedImageUrl = '';
@@ -84,6 +91,7 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
                         _selectedImageUrl = _imageUrls[index];
                         print(_selectedImageUrl);
                         AddActivity.imageUrl = _selectedImageUrl;
+                        EditActivity.imageUrl = _selectedImageUrl;
                       });
                       Navigator.pop(context);
                     },
