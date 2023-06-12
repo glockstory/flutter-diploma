@@ -79,6 +79,34 @@ class _EditActivityState extends State<EditActivity> {
     );
   }
 
+  Future<void> _showConfirm() async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Success'),
+          content: SingleChildScrollView(
+            child: Column(
+              children: <Widget>[
+                Text('Successful edited'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Confirm'),
+              onPressed: () {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => CalendarPage()));
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   List<Activity> activities = [];
   String selectedImg = '';
 
@@ -116,6 +144,7 @@ class _EditActivityState extends State<EditActivity> {
 
     if (response.statusCode == 200) {
       print('Success edited!');
+      _showConfirm();
     } else {
       print(response.body);
     }
