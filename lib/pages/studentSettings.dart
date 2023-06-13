@@ -1,10 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_final/pages/students.dart';
-import 'package:flutter_final/styles/buttonstyle.dart';
 import 'package:flutter_final/styles/textstyle.dart';
-import 'package:flutter_final/widgets/button.dart';
 import 'package:http/http.dart' as http;
 
 class StudentSettings extends StatefulWidget {

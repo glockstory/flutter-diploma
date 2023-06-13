@@ -4,7 +4,6 @@ import 'package:flutter_final/pages/calendar.dart';
 import 'package:flutter_final/widgets/imagePicker.dart';
 import 'package:flutter_final/styles/textstyle.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
-import 'package:flutter_final/widgets/button.dart';
 import 'package:flutter_final/widgets/studentsPicker.dart';
 import 'package:flutter_final/widgets/twoButtons.dart';
 import 'package:intl/intl.dart';
@@ -14,8 +13,11 @@ import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class EditActivity extends StatefulWidget {
+  //Необязательная переменная получения ссылки на пиктограмму при редактировании события из класса ImagePickerWidget
   static String? imageUrl;
+  //Необязательная переменная получения выделенных студентов из виджета StudentPicker
   static List? selectedStudentsToSend;
+  //id редактируемого события
   final String activityId;
 
   const EditActivity({super.key, required this.activityId});
@@ -24,6 +26,7 @@ class EditActivity extends StatefulWidget {
   State<EditActivity> createState() => _EditActivityState();
 }
 
+//Список значений для dropdownbutton
 const List<String> list = <String>[
   'Никогда',
   'Каждый день',
@@ -31,6 +34,7 @@ const List<String> list = <String>[
   'Каждый месяц'
 ];
 
+//индекс выбранного значения dropdownbutton
 int selectedRepeatType = 0;
 
 class _EditActivityState extends State<EditActivity> {
@@ -39,6 +43,8 @@ class _EditActivityState extends State<EditActivity> {
   TextEditingController _timeStartController = TextEditingController();
   TextEditingController _timeEndController = TextEditingController();
   List<bool> _isSelected = [false, false];
+
+    //функция вызова диалога подверждения удаления активности
 
   Future<void> _showMyDialog() async {
     return showDialog<void>(
@@ -79,6 +85,7 @@ class _EditActivityState extends State<EditActivity> {
     );
   }
 
+  //функция вызова диалога подверждения изменения активности
   Future<void> _showConfirm() async {
     return showDialog<void>(
       context: context,
@@ -107,12 +114,14 @@ class _EditActivityState extends State<EditActivity> {
     );
   }
 
+  //Список событий
   List<Activity> activities = [];
+  //Выбранная пиктограмма
   String selectedImg = '';
-
+  
+  //Функция изменения события (запрос на сервер)
   Future putActivity() async {
     final activityId = widget.activityId;
-
     final List<String> studentsId = [];
 
     if (EditActivity.selectedStudentsToSend != null) {
@@ -150,6 +159,7 @@ class _EditActivityState extends State<EditActivity> {
     }
   }
 
+  //Функция поиска события (запрос на сервер)
   Future<void> findActivity() async {
     final activityId = widget.activityId;
     print(activityId);
@@ -178,9 +188,9 @@ class _EditActivityState extends State<EditActivity> {
     }
   }
 
+  //Функция удаления активности (запрос на сервер)
   Future<void> deleteActivity() async {
     final activityId = widget.activityId;
-
     final Uri uri =
         Uri.parse('http://10.0.2.2:3000/api/activities/$activityId');
     final response = await http.delete(
@@ -194,47 +204,7 @@ class _EditActivityState extends State<EditActivity> {
     }
   }
 
-  Future<void> createActivity() async {
-    final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
-    mongo.ObjectId coachId = mongo.ObjectId.parse(userId!);
-    final Uri uri = Uri.parse('http://10.0.2.2:3000/activities/create');
-    final List<String> studentsId = [];
-
-    if (EditActivity.selectedStudentsToSend != null) {
-      for (var element in EditActivity.selectedStudentsToSend!) {
-        final id = element.id;
-        studentsId.add(id);
-      }
-    }
-
-    final response = await http.post(
-      uri,
-      body: jsonEncode(
-        <String, dynamic>{
-          'name': _titleController.text,
-          'date': _dateController.text,
-          'start': _timeStartController.text,
-          'end': _timeEndController.text,
-          'pictogram': EditActivity.imageUrl ?? '',
-          'repeatType': selectedRepeatType.toString(),
-          'coachId': coachId,
-          'students': studentsId,
-        },
-      ),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8'
-      },
-    );
-    print(response.statusCode);
-    if (response.statusCode == 201) {
-      await _showMyDialog();
-    } else {
-      print(response.body);
-      throw Exception('Failed to create activity');
-    }
-  }
-
+  //Инициализация страницы
   @override
   void initState() {
     super.initState();
@@ -242,8 +212,9 @@ class _EditActivityState extends State<EditActivity> {
   }
 
   final _formKey = GlobalKey<FormState>();
-
+  //Выбранное значение для dropdowmButton
   String dropdownvalue = list[selectedRepeatType];
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -274,7 +245,6 @@ class _EditActivityState extends State<EditActivity> {
                                 hintText: 'Введите заголовок',
                                 border: InputBorder.none),
                             onChanged: (value) {
-                              //TODO: save value
                             },
                           ),
                           Row(
@@ -409,11 +379,6 @@ class _EditActivityState extends State<EditActivity> {
                                       })
                                 ]),
                           ),
-                          // MyButton(
-                          //     label: 'Изменить',
-                          //     onTap: () {
-                          //       createActivity();
-                          //     }),
                           SizedBox(height: 60)
                         ],
                       ),

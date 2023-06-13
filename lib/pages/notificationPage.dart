@@ -1,11 +1,9 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_final/models/notification.dart';
 import 'package:flutter_final/styles/textstyle.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-
 import 'package:collection/collection.dart';
 
 class NotificationPage extends StatefulWidget {
@@ -16,14 +14,18 @@ class NotificationPage extends StatefulWidget {
 }
 
 class _NotificationPageState extends State<NotificationPage> {
+  //Список уведомлений
   List<Notifications> notifications = [];
   List grouped = [];
+
+  //Функция получения уведомлений (запрос на сервер)
   Future<List<Notifications>> getNotifications() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     print(userId);
     final Uri uri = Uri.parse('http://10.0.2.2:3000/notifications/$userId');
     final response = await http.get(uri);
+
     if (response.statusCode == 200) {
       final List<dynamic> notif = jsonDecode(response.body);
       print(notif);
@@ -41,9 +43,6 @@ class _NotificationPageState extends State<NotificationPage> {
       });
 
       return notifications;
-      // final List<dynamic> activitiesJson = json.decode(response.body);
-      // notifications =
-      //     activitiesJson.map((json) => Notification.fromJson(json)).toList();
     } else {
       throw Exception('Failed to load records');
     }
@@ -84,7 +83,6 @@ class _NotificationPageState extends State<NotificationPage> {
                       print(element.name);
                     },
                   );
-
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [

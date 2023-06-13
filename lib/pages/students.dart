@@ -1,46 +1,39 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_final/models/student.dart';
-import 'package:flutter_final/pages/addActivity.dart';
 import 'package:flutter_final/pages/addStudent.dart';
 import 'package:flutter_final/pages/calendar.dart';
 import 'package:flutter_final/pages/mainPage.dart';
-import 'package:flutter_final/pages/register.dart';
-import 'package:flutter_final/styles/textstyle.dart';
-import 'package:flutter_final/styles/buttonstyle.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter_final/widgets/button.dart';
-import 'package:flutter_final/widgets/gridViewWidget.dart';
-import 'package:flutter_final/widgets/inputField.dart';
 import 'package:flutter_final/widgets/studentCard.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import '../utils.dart';
 
 class StudentsPage extends StatefulWidget {
   @override
   _StudentsPageState createState() => _StudentsPageState();
 }
 
-List<Key> studentKeys = List.generate(10, (_) => UniqueKey());
-
 class _StudentsPageState extends State<StudentsPage> {
+  //Список студентов
   List<Student> students = [];
-  int countStudents = 1;
-
+  
+  //Функция получения списка студентов ЛИО (запрос на сервер)
   Future<List<Student>> getStudents() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     print(userId);
     final Uri uri = Uri.parse('http://10.0.2.2:3000/students/$userId');
     final response = await http.get(uri);
+    
     if (response.statusCode == 200) {
       final List<dynamic> studentJson = json.decode(response.body);
       students = studentJson.map((json) => Student.fromJson(json)).toList();
       print(students);
       print(students.length);
+      
       return students;
+
     } else {
       throw Exception('Failed to load records');
     }

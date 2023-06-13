@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_final/pages/students.dart';
 import 'package:flutter_final/styles/buttonstyle.dart';
@@ -17,8 +16,10 @@ class AddStudent extends StatefulWidget {
 }
 
 class _AddStudentState extends State<AddStudent> {
+  //Контроллер соответствующего поля
   final TextEditingController _nameController = TextEditingController();
 
+  //Функция создания студента (запрос на сервер)
   Future<void> createStudent() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');

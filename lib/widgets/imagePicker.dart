@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_final/models/imageUrl.dart';
 import 'package:flutter_final/pages/addActivity.dart';
 import 'package:flutter_final/pages/editActivity.dart';
 import 'package:http/http.dart' as http;
@@ -36,7 +35,6 @@ class _ImagePickerWidgetState extends State<ImagePickerWidget> {
 
   @override
   void dispose() {
-    //widget.selectedImage.dispose(); // don't forget to dispose
     super.dispose();
   }
 

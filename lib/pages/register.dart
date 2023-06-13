@@ -1,9 +1,7 @@
 import 'dart:convert';
-
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_final/pages/mainPage.dart';
-import 'package:flutter_final/pages/register.dart';
 import 'package:flutter_final/styles/buttonstyle.dart';
 import 'package:flutter_final/styles/textstyle.dart';
 import 'package:flutter_final/widgets/button.dart';
@@ -15,11 +13,14 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
+  //Контроллеры соответствующих полей
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
+  //Глобальный ключ для валидации полей
   final _formKey = GlobalKey<FormState>();
 
+  //Функция регистрации пользователя(запрос на сервер)
   Future<void> _submit() async {
     if (_formKey.currentState!.validate()) {
       final Uri uri = Uri.parse('http://10.0.2.2:3000/register');
@@ -32,7 +33,9 @@ class _RegisterPageState extends State<RegisterPage> {
             'email': _emailController.text,
             'password': _passwordController.text,
           }));
+          
       print(response.body);
+
       if (response.statusCode == 201) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('User created')),
@@ -45,10 +48,12 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
+  //Ссылка на картинку лого
   final String logoImage = 'assets/logo.png';
-
+  //Стиль кнопки
   final ButtonStyle styleButton = ButtonStyle(
       minimumSize: MaterialStateProperty.all(const Size(double.infinity, 50)));
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -118,16 +123,9 @@ class _RegisterPageState extends State<RegisterPage> {
                       })
               ])),
               SizedBox(height: 10.0),
-              // ElevatedButton(
-              //     onPressed: () {},
-              //     child: Text('Зарегистрироваться', style: buttonText),
-              //     style: styleButton),
               MyButton(
                 label: 'Зарегистрироваться',
                 onTap: _submit,
-
-                // Navigator.push(context,
-                //     MaterialPageRoute(builder: (context) => MainPage()));
               )
             ]),
           ),

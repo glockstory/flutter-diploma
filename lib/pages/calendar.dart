@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_final/models/activity.dart';
 import 'package:flutter_final/models/student.dart';
@@ -10,7 +9,6 @@ import 'package:flutter_final/pages/students.dart';
 import 'package:flutter_final/pages/mainPage.dart';
 import 'package:flutter_final/styles/textstyle.dart';
 import 'package:flutter_final/widgets/button.dart';
-import 'package:flutter_final/widgets/studentsPicker.dart';
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'dart:convert';
@@ -22,11 +20,13 @@ class CalendarPage extends StatefulWidget {
 }
 
 class _CalendarPageState extends State<CalendarPage> {
+  //Создание событий для календаря
   CalendarDataSource _getCalendarDataSource() {
     List<Appointment> appointments = <Appointment>[];
 
     activities.forEach(
       (activity) {
+        //Преобразование даты с сервера из String в DateTime
         List<String> dateParts = activity.date.split('.');
         int day = int.parse(dateParts[0]);
         int month = int.parse(dateParts[1]);
@@ -48,6 +48,7 @@ class _CalendarPageState extends State<CalendarPage> {
         DateTime timeEnd =
             DateTime(date.year, date.month, date.day, time2.hour, time2.minute);
 
+        //Добавление события
         appointments.add(Appointment(
           startTime: timeStart,
           endTime: timeEnd,
@@ -56,66 +57,62 @@ class _CalendarPageState extends State<CalendarPage> {
         ));
       },
     );
-    // List<Activity> activities = activitiesCalendar;
-    // print(activities);
-    //print(activitiesCalendar);
     return _AppointmentDataSource(appointments);
   }
-
+  //Массив событий
   List<Activity> activities = [];
-
+  //Студенты в событии
   List studentsOnCard = [];
-  List exampleStudents = [];
+
+  //Функция поиска активности по ее id (запрос на сервер)
   Future<void> findActivity(activityId) async {
-    //final activityId = widget.activityId;
-    //print(activityId);
     final Uri uri = Uri.parse('http://10.0.2.2:3000/activity/$activityId');
     final response = await http.get(uri);
+    
     if (response.statusCode == 200) {
       final List<dynamic> activitiesJson = json.decode(response.body);
       final activity =
           activitiesJson.map((json) => Activity.fromJson(json)).toList();
       activity.forEach(
         (element) {
-          //studentsOnCard.add(element.students);
           element.students.forEach((element) {});
         },
       );
     }
   }
 
+  //Функция получение списка студентов (запрос на сервер)
   Future<void> getStudents() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     print(userId);
     final Uri uri = Uri.parse('http://10.0.2.2:3000/students/$userId');
     final response = await http.get(uri);
+    
     if (response.statusCode == 200) {
       final List<dynamic> studentJson = json.decode(response.body);
       final students =
           studentJson.map((json) => Student.fromJson(json)).toList();
-
       studentsOnCard = students;
-
-      //print(students);
-      //print(students.length);
     } else {
       throw Exception('Failed to load records');
     }
   }
 
+  //Функция получения всех активностей (запрос на сервер)
   Future<List<Activity>> getActivities() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
     print(userId);
     final Uri uri = Uri.parse('http://10.0.2.2:3000/activities/$userId');
     final response = await http.get(uri);
+    
     if (response.statusCode == 200) {
-      //final activities = jsonDecode(response.body);
       final List<dynamic> activitiesJson = json.decode(response.body);
       activities =
           activitiesJson.map((json) => Activity.fromJson(json)).toList();
       print('lenght of activities: ${activities.length}');
+      
       return activities;
     } else {
       throw Exception('Failed to load records');
@@ -137,7 +134,6 @@ class _CalendarPageState extends State<CalendarPage> {
                 },
                 icon: Icon(Icons.notifications))
           ],
-          //leading: Icon(Icons.menu),
         ),
         drawer: Drawer(
             child: SafeArea(

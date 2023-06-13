@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_final/models/imageUrl.dart';
 import 'package:flutter_final/pages/calendar.dart';
 import 'package:flutter_final/widgets/imagePicker.dart';
 import 'package:flutter_final/styles/textstyle.dart';
@@ -14,7 +13,9 @@ import 'package:mongo_dart/mongo_dart.dart' as mongo;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddActivity extends StatefulWidget {
+  //Необязательная переменная получения ссылки на пиктограмму при редактировании события из класса ImagePickerWidget
   static String? imageUrl;
+  //Необязательная переменная получения выделенных студентов из виджета StudentPicker
   static List? selectedStudentsToSend;
 
   const AddActivity({super.key});
@@ -23,6 +24,7 @@ class AddActivity extends StatefulWidget {
   State<AddActivity> createState() => _AddActivityState();
 }
 
+//Список значений для dropdownbutton
 const List<String> list = <String>[
   'Никогда',
   'Каждый день',
@@ -30,15 +32,18 @@ const List<String> list = <String>[
   'Каждый месяц'
 ];
 
+//индекс выбранного значения dropdownbutton
 int selectedRepeatType = 0;
 
 class _AddActivityState extends State<AddActivity> {
+  //Контроллеры соответствующих полей
   TextEditingController _titleController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
   TextEditingController _timeStartController = TextEditingController();
   TextEditingController _timeEndController = TextEditingController();
-  List<bool> _isSelected = [false, false];
-
+  //Значение для dropdownbutton по умолчанию
+  String dropdownvalue = list.first;
+  //функция вызова диалога подверждения создания активности
   Future<void> _showMyDialog() async {
     return showDialog<void>(
       context: context,
@@ -68,6 +73,7 @@ class _AddActivityState extends State<AddActivity> {
     );
   }
 
+  //Функция создания уведомления (запрос на сервер) 
   Future<void> createNotification(responseActivityId) async {
     final activityId = json.decode(responseActivityId);
     final prefs = await SharedPreferences.getInstance();
@@ -100,6 +106,7 @@ class _AddActivityState extends State<AddActivity> {
     }
   }
 
+  //Функция создания события (запрос на сервер)
   Future<void> createActivity() async {
     final prefs = await SharedPreferences.getInstance();
     final userId = prefs.getString('userId');
@@ -143,9 +150,11 @@ class _AddActivityState extends State<AddActivity> {
     }
   }
 
+  //Глобальный ключ 
   final _formKey = GlobalKey<FormState>();
 
-  String dropdownvalue = list.first;
+
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
